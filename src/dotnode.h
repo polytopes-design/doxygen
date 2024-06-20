@@ -117,6 +117,7 @@ class DotNode
 
     void colorConnectedNodes(int curColor);
     void setDistance(int distance);
+    void setType(const QCString& str) {m_type = str;}
     void markAsVisible(bool b=TRUE) { m_visible=b; }
     DotNode& markAsTruncated(bool b=TRUE) { m_truncated=b ? Truncated : Untruncated; return *this;}
     const DotNodeRefVector &children() const { return m_children; }
@@ -143,6 +144,7 @@ class DotNode
     int              m_distance   = 1000;    //!< shortest path to the root node
     bool             m_renumbered = false;   //!< indicates if the node has been renumbered (to prevent endless loops)
     int              m_subgraphId = -1;
+    QCString         m_type;
 };
 
 class DotNodeMap : public std::map<std::string,DotNode*>

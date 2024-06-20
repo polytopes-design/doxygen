@@ -546,22 +546,29 @@ void DotNode::writeBox(TextStream &t,
   else
   {
     labCol = m_url.isEmpty() ? "grey60" :  // non link
-    (hasNonReachableChildren ? "red" : "grey40");
+    (hasNonReachableChildren ? "red" : "red");
     fillCol = m_url.isEmpty() ? "#E0E0E0" :
-    (hasNonReachableChildren ? "#FFF0F0" : "white");
+    (hasNonReachableChildren ? "#FFF0F0" : "#FFF0F0");
   }
+
+  std::string type = m_type.str();
+  if (m_type == "Architecture") { labCol = "#00aa00"; fillCol = "#88ff88"; }
+  if (m_type == "Library")      { labCol = "#0000aa"; fillCol = "#8888ff"; }
+  if (m_type == "Output")       { labCol = "#aa0000"; }
+
+
   t << "  Node" << m_number << " [";
   t << "id=\"Node" << QCString().sprintf("%06d",m_number) << "\",";
   writeLabel(t,gt);
   t << ",height=0.2,width=0.4";
-  if (m_isRoot)
+  // if (m_isRoot)
+  // {
+  //   t << ",color=\"gray40\", fillcolor=\"grey60\", style=\"filled\", fontcolor=\"black\"";
+  // }
+  // else
   {
-    t << ",color=\"gray40\", fillcolor=\"grey60\", style=\"filled\", fontcolor=\"black\"";
-  }
-  else
-  {
-    t << ",color=\"" << labCol << "\"";
-    t << ", fillcolor=\"" << fillCol << "\"";
+    t << ", color=\""     << labCol   << "\"";
+    t << ", fillcolor=\"" << fillCol  << "\"";
     t << ", style=\"filled\"";
     writeUrl(t);
   }

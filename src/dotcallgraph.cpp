@@ -32,6 +32,7 @@ static QCString getUniqueId(const MemberDef *md)
 
 void DotCallGraph::buildGraph(DotNode *n,const MemberDef *md,int distance)
 {
+  n->setType(md->typeString());
   auto refs = m_inverse ? md->getReferencedByMembers() : md->getReferencesMembers();
   for (const auto &rmd : refs)
   {
@@ -66,6 +67,7 @@ void DotCallGraph::buildGraph(DotNode *n,const MemberDef *md,int distance)
             uniqueId,
             0 //distance
             );
+        bn->setType(rmd->typeString());
         n->addChild(bn,EdgeInfo::Blue,EdgeInfo::Solid);
         bn->addParent(n);
         bn->setDistance(distance);
