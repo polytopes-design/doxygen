@@ -143,7 +143,21 @@ DotCallGraph::DotCallGraph(const MemberDef *md,bool inverse)
   );
   m_startNode->setDistance(0);
   m_usedNodes.insert(std::make_pair(uniqueId.str(),m_startNode));
-  buildGraph(m_startNode,md,1);
+
+
+  int distance = 2;
+
+  std::string type = md->typeString().str() + ":";
+  int typeLen = type.length();
+
+  auto depthList = Config_getList(DOT_GRAPH_CUSTOM_DEPTH);
+
+  for (auto& custom : depthList)
+  {
+    if (custom.substr(0, typeLen) == type) {  distance--; break;  }
+  }
+
+  buildGraph(m_startNode,md,distance);
 
   int maxNodes = Config_getInt(DOT_GRAPH_MAX_NODES);
   DotNodeDeque openNodeQueue;

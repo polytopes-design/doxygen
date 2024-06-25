@@ -98,6 +98,8 @@ class DefinitionImpl::IMPL
 
     std::unordered_map<std::string,MemberDef *> sourceRefByDict;
     std::unordered_map<std::string,MemberDef *> sourceRefsDict;
+    MemberVector                                sourceRefByVect;
+    MemberVector                                sourceRefsVect;
     RefItemVector xrefListItems;
     GroupList partOfGroups;
 
@@ -170,6 +172,8 @@ void DefinitionImpl::IMPL::init(const QCString &df, const QCString &n)
   inbodyDocs.reset();
   sourceRefByDict.clear();
   sourceRefsDict.clear();
+  sourceRefByVect.clear();
+  sourceRefsVect.clear();
   outerScope      = Doxygen::globalScope;
   hidden          = FALSE;
   isArtificial    = FALSE;
@@ -1298,6 +1302,9 @@ void DefinitionImpl::addSourceReferences(MemberDef *md)
     }
 
     m_impl->sourceRefsDict.insert({name.str(),md});
+
+    if (std::count(m_impl->sourceRefsVect.begin(), m_impl->sourceRefsVect.end(), md) < 2)
+      m_impl->sourceRefsVect.push_back(md);
   }
 }
 
@@ -1766,6 +1773,12 @@ static std::mutex g_memberReferenceMutex;
 const MemberVector &DefinitionImpl::getReferencesMembers() const
 {
   std::lock_guard<std::mutex> lock(g_memberReferenceMutex);
+
+  if (m_impl->referencesMembers.empty() && !m_impl->sourceRefsVect.empty())
+  {
+    m_impl->referencesMembers = m_impl->sourceRefsVect;
+  }
+
   if (m_impl->referencesMembers.empty() && !m_impl->sourceRefsDict.empty())
   {
     m_impl->referencesMembers = refMapToVector(m_impl->sourceRefsDict);
@@ -1776,6 +1789,12 @@ const MemberVector &DefinitionImpl::getReferencesMembers() const
 const MemberVector &DefinitionImpl::getReferencedByMembers() const
 {
   std::lock_guard<std::mutex> lock(g_memberReferenceMutex);
+
+  if (m_impl->referencedByMembers.empty() && !m_impl->sourceRefByVect.empty())
+  {
+    m_impl->referencedByMembers = m_impl->sourceRefByVect;
+  }
+
   if (m_impl->referencedByMembers.empty() && !m_impl->sourceRefByDict.empty())
   {
     m_impl->referencedByMembers = refMapToVector(m_impl->sourceRefByDict);

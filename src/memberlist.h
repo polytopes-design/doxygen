@@ -44,6 +44,9 @@ class MemberVector
     using iterator         = Vec::iterator;
     using const_iterator   = Vec::const_iterator;
 
+
+    void clear()                            { m_members.clear(); }
+
     void push_back( const T& value )        { m_members.push_back(value); }
     void push_back( T&& value )             { m_members.push_back(std::move(value)); }
 
@@ -63,6 +66,7 @@ class MemberVector
 
           reference back()                  { return m_members.back();  }
     const_reference back() const            { return m_members.back();  }
+
 
           reference operator[]( size_type pos )       { return m_members.operator[](pos); }
     const_reference operator[]( size_type pos ) const { return m_members.operator[](pos); }

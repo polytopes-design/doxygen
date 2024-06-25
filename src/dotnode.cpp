@@ -284,6 +284,7 @@ QCString DotNode::convertLabel(const QCString &l, bool htmlLike)
   {
      result = result.stripWhiteSpace();
   }
+
   return result;
 }
 
@@ -517,8 +518,10 @@ void DotNode::writeBox(TextStream &t,
                        GraphOutputFormat /*format*/,
                        bool hasNonReachableChildren) const
 {
-  const char *labCol = nullptr;
-  const char *fillCol = "white";
+  std::string style   = "rounded,filled";
+  std::string labCol;
+  std::string fillCol = "white";
+  std::string shape   = "box";
   if (m_classDef)
   {
     if (m_classDef->hasDocumentation() && hasNonReachableChildren)
@@ -551,25 +554,40 @@ void DotNode::writeBox(TextStream &t,
     (hasNonReachableChildren ? "#FFF0F0" : "#FFF0F0");
   }
 
-  std::string type = m_type.str();
-  if (m_type == "Architecture") { labCol = "#00aa00"; fillCol = "#88ff88"; }
-  if (m_type == "Library")      { labCol = "#0000aa"; fillCol = "#8888ff"; }
-  if (m_type == "Output")       { labCol = "#aa0000"; }
+  std::string type = m_type.str() + ":";
+  int typeLen = type.length();
 
+  auto customShapes   = Config_getList(DOT_CUSTOM_SHAPES);      customShapes  .push_back(type + shape);
+  auto customFills    = Config_getList(DOT_CUSTOM_FILLS);       customFills   .push_back(type + fillCol);
+  auto customOutlines = Config_getList(DOT_CUSTOM_OUTLINES);    customOutlines.push_back(type + labCol);
+  auto customStyles   = Config_getList(DOT_CUSTOM_STYLES);      customStyles  .push_back(type + style);
+
+  for (auto& custom : customShapes)   {   if (custom.substr(0, typeLen) == type) {  shape   = custom.substr(typeLen); break; }}
+  for (auto& custom : customFills)    {   if (custom.substr(0, typeLen) == type) {  fillCol = custom.substr(typeLen); break; }}
+  for (auto& custom : customOutlines) {   if (custom.substr(0, typeLen) == type) {  labCol  = custom.substr(typeLen); break; }}
+  for (auto& custom : customStyles)   {   if (custom.substr(0, typeLen) == type) {  style   = custom.substr(typeLen); break; }}
 
   t << "  Node" << m_number << " [";
   t << "id=\"Node" << QCString().sprintf("%06d",m_number) << "\",";
   writeLabel(t,gt);
-  t << ",height=0.2,width=0.4";
-  // if (m_isRoot)
-  // {
+  t << ", height=0.2,width=0.4";
+  t << ", ordering=\"out\"";
+
+  if (m_isRoot)
+  {
+    style += ",bold";
+    // t << ", style=\"";
+    // t << "bold,";
+    // t << "\"";
   //   t << ",color=\"gray40\", fillcolor=\"grey60\", style=\"filled\", fontcolor=\"black\"";
-  // }
+  }
   // else
   {
+    t << ", shape=\""     << shape    << "\"";
     t << ", color=\""     << labCol   << "\"";
     t << ", fillcolor=\"" << fillCol  << "\"";
-    t << ", style=\"filled\"";
+    t << ", style=\""     << style    << "\"";
+
     writeUrl(t);
   }
   if (!m_tooltip.isEmpty())
