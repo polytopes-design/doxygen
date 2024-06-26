@@ -1351,7 +1351,7 @@ private                                 {
                                             yyextra->docBlockJavaStyle = FALSE;
                                             yyextra->docBlock.clear();
                                             yyextra->docBlockJavaStyle = Config_getBool(JAVADOC_AUTOBRIEF);
-                                            startCommentBlock(yyscanner,TRUE);
+                                            startCommentBlock(yyscanner,FALSE);
                                             yy_push_state(DocBackLine,yyscanner);
                                           }
                                           else
@@ -1421,7 +1421,7 @@ private                                 {
                                           if (YY_START==SubprogBody) yyextra->docBlockInBody = TRUE;
                                           yyextra->docBlock.clear();
                                           yyextra->docBlockJavaStyle = Config_getBool(JAVADOC_AUTOBRIEF);
-                                          startCommentBlock(yyscanner,TRUE);
+                                          startCommentBlock(yyscanner,FALSE);
                                           BEGIN(DocBlock);
                                           //cout << "start DocBlock " << endl;
                                         }
@@ -1529,7 +1529,7 @@ private                                 {
                                         }
 <DocBlock>"\\ilinebr "{BS}              {
                                           QCString indent;
-                                          int extraSpaces = std::max(0,static_cast<int>(yyleng-9-yyextra->curIndent-1));
+                                          int extraSpaces = std::max(0,static_cast<int>(yyleng-9-yyextra->curIndent-2));
                                           indent.fill(' ',extraSpaces);
                                           //printf("extraSpaces=%d\n",extraSpaces);
                                           yyextra->docBlock += "\\ilinebr ";
